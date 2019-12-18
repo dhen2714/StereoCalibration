@@ -206,7 +206,6 @@ class LeopardStereoCal:
         Re-calibrate intrinsic parameters with exclusions.
         """
         inds = self.cal_inds
-        print('Recalculating intrinsics:')
         self.params1 = calibrate_camera(
             self.objpoints[inds], 
             self.points1[inds],
@@ -327,8 +326,12 @@ class LeopardStereoCal:
 
         if self.intrinsics_recalibrated:
             inds = np.arange(len(self.cal_inds), dtype=int)
+            points1 = self.points1[self.cal_inds]
+            points2 = self.points2[self.cal_inds]
         else:
             inds = self.cal_inds
+            points1 = self.points1
+            points2 = self.points2
 
         for i in inds:
             # Convert rotation vec1 to matrix
@@ -351,8 +354,8 @@ class LeopardStereoCal:
                 self.params2.K,
                 self.params2.dc
             )
-            errors1 = np.squeeze(self.points1[i] - reprojections1)
-            errors2 = np.squeeze(self.points2[i] - reprojections2)
+            errors1 = np.squeeze(points1[i] - reprojections1)
+            errors2 = np.squeeze(points2[i] - reprojections2)
             rms1[i] = np.mean(np.sqrt(errors1[:, 0]**2 + errors1[:, 1]**2))
             rms2[i] = np.mean(np.sqrt(errors2[:, 0]**2 + errors2[:, 1]**2))
 
